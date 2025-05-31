@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en" class=""> <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faris Natour Photography</title>
+    <meta name="description" content="Portfolio of Faris Natour, showcasing portraits, nature, street, and lifestyle photography.">
+    <meta name="keywords" content="Faris Natour, photography, portfolio, portraits, nature, street, lifestyle, photographer Virginia">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Theme Variables */
+        :root {
+            --light-bg: #f8f9fa; /* Very light grey */
+            --light-text: #212529; /* Dark grey/black */
+            --light-accent: #B08D57; /* Muted Gold */
+            --light-card-bg: #ffffff;
+            --light-border: #dee2e6;
+
+            --dark-bg: #121212; /* Near-black */
+            --dark-text: #e9ecef; /* Light grey/white */
+            --dark-accent: #B08D57; /* Muted Gold */
+            --dark-card-bg: #1e1e1e;
+            --dark-border: #343a40;
+        }
+
+        html.dark {
+            --bg-color: var(--dark-bg);
+            --text-color: var(--dark-text);
+            --accent-color: var(--dark-accent);
+            --card-bg-color: var(--dark-card-bg);
+            --border-color: var(--dark-border);
+            --muted-text-color: #adb5bd;
+        }
+
+        html:not(.dark) {
+            --bg-color: var(--light-bg);
+            --text-color: var(--light-text);
+            --accent-color: var(--light-accent);
+            --card-bg-color: var(--light-card-bg);
+            --border-color: var(--light-border);
+            --muted-text-color: #6c757d;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Playfair Display', serif;
+            color: var(--text-color);
+        }
+
+        .accent-text { color: var(--accent-color); }
+        .accent-bg { background-color: var(--accent-color); }
+        .accent-border { border-color: var(--accent-color); }
+        .card-bg { background-color: var(--card-bg-color); }
+        .border-color { border-color: var(--border-color); }
+        .muted-text { color: var(--muted-text-color); }
+
+
+        /* Header */
+        .header {
+            background-color: var(--bg-color); /* Semi-transparent background */
+            transition: background-color 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        html.dark .header {
+            box-shadow: 0 2px 4px rgba(255,255,255,0.05);
+        }
+
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        .nav-link:hover {
+            color: var(--accent-color);
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--accent-color);
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 100%;
+        }
+        .nav-link.active {
+             color: var(--accent-color);
+        }
+
+
+        /* Page Transition */
+        .page-content {
+            opacity: 1;
+            filter: blur(0);
+            transition: opacity 0.5s ease-out, filter 0.5s ease-out;
+            min-height: calc(100vh - 120px); /* Adjust based on header/footer height */
+        }
+        .page-content.loading {
+            opacity: 0;
+            filter: blur(5px);
+        }
+
+        /* Masonry Grid for Portfolio */
+        .masonry-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem; /* 24px */
+        }
+        .masonry-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 0.5rem; /* 8px */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        .masonry-item img:hover {
+            transform: scale(1.03);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        html.dark .masonry-item img:hover {
+            box-shadow: 0 10px 20px rgba(255,255,255,0.08);
+        }
+
+
+        /* Lightbox */
+        .lightbox {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+        }
+        html.dark .lightbox {
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+        .lightbox.active {
+            opacity: 1;
+            visibility: visible;
+            transition-delay: 0s;
+        }
+        .lightbox-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+        }
+        .lightbox-content img {
+            max-width: 100%;
+            max-height: 85vh; /* Ensure space for controls/caption */
+            border-radius: 0.5rem;
+            object-fit: contain;
+        }
+        .lightbox-close, .lightbox-prev, .lightbox-next {
+            position: absolute;
+            background: rgba(30, 30, 30, 0.7);
+            color: white;
+            border: none;
+            padding: 0.75rem; /* 12px */
+            cursor: pointer;
+            border-radius: 0.375rem; /* 6px */
+            transition: background-color 0.2s ease;
+            z-index: 1001; /* Ensure buttons are above image if overlapping */
+        }
+        .lightbox-close:hover, .lightbox-prev:hover, .lightbox-next:hover {
+            background: rgba(0, 0, 0, 0.9);
+        }
+        .lightbox-close {
+            top: 1rem; /* 16px */
+            right: 1rem; /* 16px */
+            font-size: 1.5rem; /* 24px */
+            line-height: 1;
+        }
+        .lightbox-prev {
+            top: 50%;
+            left: 1rem; /* 16px */
+            transform: translateY(-50%);
+            font-size: 1.5rem; /* 24px */
+        }
+        .lightbox-next {
+            top: 50%;
+            right: 1rem; /* 16px */
+            transform: translateY(-50%);
+            font-size: 1.5rem; /* 24px */
+        }
+        .lightbox-caption {
+            text-align: center;
+            color: #ccc;
+            margin-top: 0.5rem; /* 8px */
+            font-size: 0.9rem; /* 14.4px */
+            padding: 0.25rem 0.5rem;
+            background: rgba(30,30,30,0.7);
+            border-radius: 0.25rem;
+            display: inline-block;
+            position: absolute;
+            bottom: -2rem; /* Adjust as needed */
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* Form Styling */
+        .form-input, .form-textarea, .form-select {
+            background-color: var(--card-bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 0.375rem; /* 6px */
+            padding: 0.75rem 1rem; /* 12px 16px */
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            width: 100%;
+        }
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.2rem rgba(var(--accent-color-rgb, 176, 141, 87), 0.25); /* Use RGB for box-shadow */
+            outline: none;
+        }
+        html:not(.dark) { --accent-color-rgb: 176, 141, 87; }
+        html.dark { --accent-color-rgb: 176, 141, 87; } /* Same for dark, ensure contrast */
+
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem; /* 12px 24px */
+            border-radius: 0.375rem; /* 6px */
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            display: inline-block;
+            text-align: center;
+        }
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: var(--light-text); /* Ensure contrast with accent */
+        }
+        html.dark .btn-primary {
+            color: var(--dark-bg); /* Better contrast on dark accent */
+        }
+        .btn-primary:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+        }
+
+        /* Scroll Animations */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .animate-on-scroll.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Homepage Hero Grid */
+        .hero-image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem; /* 16px */
+            /* Consider masonry-like behavior if items have different heights */
+        }
+        .hero-image-grid img {
+            width: 100%;
+            height: 300px; /* Fixed height for uniformity, or use object-fit with varying heights */
+            object-fit: cover;
+            border-radius: 0.5rem; /* 8px */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .hero-image-grid img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+        }
+        html.dark .hero-image-grid img {
+            box-shadow: 0 4px 12px rgba(255,255,255,0.05);
+        }
+        html.dark .hero-image-grid img:hover {
+            box-shadow: 0 8px 16px rgba(255,255,255,0.08);
+        }
+
+        /* Hamburger Menu */
+        .mobile-menu {
+            transition: transform 0.3s ease-in-out;
+            background-color: var(--bg-color); /* Solid background for menu */
+        }
+        html.dark .mobile-menu {
+             background-color: var(--dark-card-bg);
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Utility for hiding elements accessibly */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+
+        /* Loading spinner for form submission and image generation */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border-left-color: var(--accent-color);
+            animation: spin 1s ease infinite;
+            display: inline-block; /* To sit next to text */
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+
+    </style>
+</head>
+<body class="antialiased">
+
+    <header id="main-header" class="header sticky top-0 z-50 w-full py-4">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+            <a href="#home" class="text-2xl font-bold nav-link" style="font-family: 'Playfair Display', serif;">Faris Natour</a>
+            
+            <nav class="hidden md:flex space-x-6 items-center">
+                <a href="#home" class="nav-link active">Home</a>
+                <div class="relative group">
+                    <button class="nav-link">Portfolio</button>
+                    <div class="absolute left-0 mt-2 w-48 card-bg border-color border rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-in-out invisible group-hover:visible py-1 z-20">
+                        <a href="#portfolio-portraits" class="block px-4 py-2 text-sm nav-link !text-opacity-75 hover:!text-opacity-100">Portraits</a>
+                        <a href="#portfolio-nature" class="block px-4 py-2 text-sm nav-link !text-opacity-75 hover:!text-opacity-100">Nature</a>
+                        <a href="#portfolio-street" class="block px-4 py-2 text-sm nav-link !text-opacity-75 hover:!text-opacity-100">Street</a>
+                        <a href="#portfolio-lifestyle" class="block px-4 py-2 text-sm nav-link !text-opacity-75 hover:!text-opacity-100">Lifestyle</a>
+                    </div>
+                </div>
+                <a href="#about" class="nav-link">About</a>
+                <a href="#contact" class="nav-link">Contact</a>
+            </nav>
+
+            <div class="md:hidden">
+                <button id="mobile-menu-button" aria-label="Open navigation menu" aria-expanded="false" class="focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="mobile-menu md:hidden absolute top-full left-0 w-full shadow-lg transform -translate-x-full">
+            <nav class="flex flex-col space-y-1 px-4 pt-2 pb-3">
+                <a href="#home" class="nav-link block px-3 py-2 rounded-md text-base font-medium">Home</a>
+                <a href="#portfolio-portraits" class="nav-link block px-3 py-2 rounded-md text-base font-medium">Portraits</a>
+                <a href="#portfolio-nature" class="nav-link block px-3 py-2 rounded-md text-base font-medium">Nature</a>
+                <a href="#portfolio-street" class="nav-link block px-3 py-2 rounded-md text-base font-medium">Street</a>
+                <a href="#portfolio-lifestyle" class="nav-link block px-3 py-2 rounded-md text-base font-medium">Lifestyle</a>
+                <a href="#about" class="nav-link block px-3 py-2 rounded-md text-base font-medium">About</a>
+                <a href="#contact" class="nav-link block px-3 py-2 rounded-md text-base font-medium">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main-content" class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        </main>
+
+    <div id="page-templates" class="hidden">
+        <div id="home-page" class="page-content space-y-12">
+            <section class="text-center animate-on-scroll">
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">Capturing Moments, Creating Art</h1>
+                <p class="text-lg md:text-xl muted-text mb-8 max-w-2xl mx-auto">Welcome to the portfolio of Faris Natour. Explore a collection of visual stories told through portraits, nature, street, and lifestyle photography.</p>
+                <a href="#portfolio-portraits" class="btn btn-primary">Explore Portfolio</a>
+            </section>
+            <section class="animate-on-scroll">
+                <h2 class="text-3xl font-bold text-center mb-8">Featured Work</h2>
+                <div id="hero-image-display" class="hero-image-grid">
+                    </div>
+                <p class="text-center mt-4 text-sm muted-text">New images featured periodically.</p>
+            </section>
+        </div>
+
+        <div id="portfolio-category-page" class="page-content space-y-8">
+            <header class="text-center animate-on-scroll">
+                <h1 id="portfolio-category-title" class="text-4xl md:text-5xl font-bold mb-2">Category Name</h1>
+                <p id="portfolio-category-description" class="text-lg muted-text max-w-xl mx-auto">A brief introduction to this category of photography.</p>
+            </header>
+            <section id="portfolio-grid" class="masonry-grid animate-on-scroll">
+                </section>
+        </div>
+
+        <div id="about-page" class="page-content space-y-10">
+            <header class="text-center animate-on-scroll">
+                <h1 class="text-4xl md:text-5xl font-bold mb-6">About Faris Natour</h1>
+            </header>
+            <section class="flex flex-col md:flex-row gap-8 md:gap-12 items-center animate-on-scroll">
+                <div class="md:w-1/3">
+                    <img src="https://placehold.co/600x600/E2E8F0/4A5568?text=Faris+Natour" alt="Faris Natour" class="rounded-lg shadow-xl w-full h-auto object-cover">
+                </div>
+                <div class="md:w-2/3 space-y-6">
+                    <div class="card-bg p-6 rounded-lg shadow-md">
+                        <h2 class="text-2xl font-semibold mb-3 accent-text">Biography</h2>
+                        <p class="leading-relaxed muted-text">Faris Natour is a passionate photographer based in Virginia, with a keen eye for capturing the essence of his subjects and the beauty of the world around him. His journey into photography began [Year/Event placeholder], driven by a desire to tell stories and evoke emotions through visual narratives. Faris has honed his skills across various genres, always seeking to push creative boundaries and deliver compelling imagery.</p>
+                        <p class="leading-relaxed muted-text mt-3">Placeholder for more details about background, education, or significant experiences. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                    </div>
+                     <div class="card-bg p-6 rounded-lg shadow-md">
+                        <h2 class="text-2xl font-semibold mb-3 accent-text">Artist Statement</h2>
+                        <p class="leading-relaxed muted-text">"Photography, for me, is more than just taking pictures; it's about freezing a moment in time that tells a story, conveys an emotion, or reveals a hidden beauty. I strive to create images that are not only aesthetically pleasing but also resonate with the viewer on a deeper level. Whether it's the candid emotion of a portrait, the serene grandeur of nature, the raw energy of the streets, or the authentic moments of lifestyle, my goal is to capture life's diverse tapestry with authenticity and artistry."</p>
+                         <p class="leading-relaxed muted-text mt-3">Placeholder for more details on philosophy or approach. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div id="contact-page" class="page-content space-y-10">
+            <header class="text-center animate-on-scroll">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">Get In Touch</h1>
+                <p class="text-lg muted-text max-w-xl mx-auto">Have a project in mind, a question, or just want to say hello? Faris would love to hear from you.</p>
+            </header>
+
+            <section class="grid md:grid-cols-2 gap-8 md:gap-12 animate-on-scroll">
+                <div class="space-y-6">
+                    <h2 class="text-2xl font-semibold mb-3 accent-text">Contact Information</h2>
+                    <div class="card-bg p-6 rounded-lg shadow-md">
+                        <p class="flex items-center mb-3">
+                            <svg class="w-5 h-5 mr-3 accent-text" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path></svg>
+                            <a href="mailto:farisnatour2003@gmail.com" class="hover:text-blue-400 transition-colors">farisnatour2003@gmail.com</a>
+                        </p>
+                        <p class="flex items-center">
+                            <svg class="w-5 h-5 mr-3 accent-text" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path></svg>
+                            <a href="tel:571-290-9563" class="hover:text-blue-400 transition-colors">571-290-9563</a>
+                        </p>
+                    </div>
+                    <div class="card-bg p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold mb-2">Response Time</h3>
+                        <p class="muted-text">Please allow 24-48 hours for a response. Faris looks forward to connecting with you!</p>
+                    </div>
+                </div>
+
+                <div class="card-bg p-6 md:p-8 rounded-lg shadow-xl">
+                    <h2 class="text-2xl font-semibold mb-6 text-center md:text-left">Send a Message</h2>
+                    <form id="contact-form" class="space-y-6">
+                        <div>
+                            <label for="name" class="block text-sm font-medium mb-1">Full Name <span class="text-red-500">*</span></label>
+                            <input type="text" name="name" id="name" required class="form-input">
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium mb-1">Email Address <span class="text-red-500">*</span></label>
+                            <input type="email" name="email" id="email" required class="form-input">
+                        </div>
+                        <div>
+                            <label for="phone" class="block text-sm font-medium mb-1">Phone Number (Optional)</label>
+                            <input type="tel" name="phone" id="phone" class="form-input">
+                        </div>
+                        <div>
+                            <label for="subject" class="block text-sm font-medium mb-1">Subject <span class="text-red-500">*</span></label>
+                            <select name="subject" id="subject" required class="form-select">
+                                <option value="Booking Inquiry">Booking Inquiry</option>
+                                <option value="Portrait Session">Portrait Session</option>
+                                <option value="Nature Print">Nature Print</option>
+                                <option value="General Question">General Question</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="message" class="block text-sm font-medium mb-1">Message <span class="text-red-500">*</span></label>
+                            <textarea name="message" id="message" rows="4" required class="form-textarea"></textarea>
+                        </div>
+                        <div>
+                            <button type="submit" id="submit-contact-form" class="btn btn-primary w-full flex items-center justify-center">
+                                <span class="button-text">Send Message</span>
+                                <span class="spinner hidden ml-2"></span>
+                            </button>
+                        </div>
+                    </form>
+                    <div id="form-feedback" class="mt-4 text-center"></div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <footer class="py-8 mt-12">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center muted-text">
+            <div class="mb-4">
+                <a href="mailto:farisnatour2003@gmail.com" class="hover:text-accent-color mx-2">farisnatour2003@gmail.com</a>
+                <span class="mx-1">|</span>
+                <a href="tel:571-290-9563" class="hover:text-accent-color mx-2">571-290-9563</a>
+            </div>
+            <div class="flex justify-center space-x-4 mb-4">
+                <a href="#" aria-label="Instagram" class="hover:text-accent-color"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919A118.75 118.75 0 0112 2.163zm0 1.626c-3.141 0-3.499.011-4.717.066-2.705.123-3.977 1.4-4.099 4.099-.056 1.217-.066 1.575-.066 4.717s.01 3.499.066 4.717c.123 2.699 1.394 3.977 4.099 4.099 1.218.056 1.575.066 4.717.066s3.499-.01 4.717-.066c2.705-.123 3.977-1.4 4.099-4.099.056-1.217.066-1.575.066-4.717s-.01-3.499-.066-4.717c-.123-2.699-1.394-3.977-4.099-4.099-1.218-.056-1.575-.066-4.717-.066zm0 2.999a4.996 4.996 0 100 9.992 4.996 4.996 0 000-9.992zm0 1.626a3.37 3.37 0 110 6.74 3.37 3.37 0 010-6.74zM16.965 6.575a1.265 1.265 0 100 2.53 1.265 1.265 0 000-2.53z"></path></svg></a>
+                <a href="#" aria-label="Facebook" class="hover:text-accent-color"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M22.675 0H1.325C.593 0 0 .593 0 1.325v21.351C0 23.407.593 24 1.325 24H12.82v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116c.732 0 1.325-.593 1.325-1.325V1.325C24 .593 23.407 0 22.675 0z"></path></svg></a>
+                <a href="#" aria-label="Twitter" class="hover:text-accent-color"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"></path></svg></a>
+            </div>
+            <p>&copy; <span id="current-year"></span> Faris Natour. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <div id="lightbox" class="lightbox">
+        <button id="lightbox-close" class="lightbox-close" aria-label="Close image viewer">&times;</button>
+        <button id="lightbox-prev" class="lightbox-prev" aria-label="Previous image">&#10094;</button>
+        <button id="lightbox-next" class="lightbox-next" aria-label="Next image">&#10095;</button>
+        <div class="lightbox-content">
+            <img id="lightbox-image" src="" alt="Enlarged view">
+            <p id="lightbox-caption" class="lightbox-caption"></p>
+        </div>
+    </div>
+
+    <script>
+        // --- Configuration & Data ---
+        const photographerInfo = {
+            name: "Faris Natour",
+            email: "farisnatour2003@gmail.com",
+            phone: "571-290-9563"
+        };
+
+        const allPhotos = {
+            portraits: [
+                { src: 'https://placehold.co/600x800/A3BFFA/1C2B4D?text=Portrait+1', alt: 'Elegant portrait of a person', title: 'Serene Gaze' },
+                { src: 'https://placehold.co/700x850/FAD2A3/4D2C1C?text=Portrait+2', alt: 'Candid street portrait', title: 'Urban Spirit' },
+                { src: 'https://placehold.co/800x600/A3FAD2/1C4D2B?text=Portrait+3', alt: 'Professional headshot', title: 'Confident Smile' },
+                { src: 'https://placehold.co/650x900/D2A3FA/2B1C4D?text=Portrait+4', alt: 'Artistic black and white portrait', title: 'Monochrome Mood' },
+                { src: 'https://placehold.co/750x800/FAA3A3/4D1C1C?text=Portrait+5', alt: 'Lifestyle portrait outdoors', title: 'Golden Hour Glow' }
+            ],
+            nature: [
+                { src: 'https://placehold.co/1200x800/A3D2FA/1C3B4D?text=Nature+1', alt: 'Majestic mountain range at sunrise', title: 'Alpine Dawn' },
+                { src: 'https://placehold.co/1000x700/FADAA3/4D3B1C?text=Nature+2', alt: 'Lush forest pathway with sunbeams', title: 'Forest Whispers' },
+                { src: 'https://placehold.co/1100x750/A3FABF/1C4D32?text=Nature+3', alt: 'Serene lake reflecting the sky', title: 'Mirror Lake' },
+                { src: 'https://placehold.co/1300x850/D9A3FA/321C4D?text=Nature+4', alt: 'Dramatic coastal cliffs and waves', title: 'Coastal Power' },
+                { src: 'https://placehold.co/900x600/FAAAB3/4D1C23?text=Nature+5', alt: 'Close-up of a vibrant flower', title: 'Petal Perfection' }
+            ],
+            street: [
+                { src: 'https://placehold.co/900x600/B3A3FA/231C4D?text=Street+1', alt: 'Busy city street with motion blur', title: 'City Pulse' },
+                { src: 'https://placehold.co/700x1000/FAF0A3/4D471C?text=Street+2', alt: 'Graffiti art on a brick wall', title: 'Urban Canvas' },
+                { src: 'https://placehold.co/800x700/A3FAD9/1C4D3A?text=Street+3', alt: 'Silhouette of a person walking at dusk', title: 'Evening Stroll' },
+                { src: 'https://placehold.co/1000x800/FACDA3/4D321C?text=Street+4', alt: 'Old architecture in a historic district', title: 'Timeless Streets' },
+                { src: 'https://placehold.co/600x900/A3B3FA/1C234D?text=Street+5', alt: 'Street performer entertaining a crowd', title: 'Rhythm of the City' }
+            ],
+            lifestyle: [
+                { src: 'https://placehold.co/1000x750/FABFA3/4D2C1C?text=Lifestyle+1', alt: 'Friends laughing at a cafe', title: 'Shared Moments' },
+                { src: 'https://placehold.co/800x1000/A3FACA/1C4D33?text=Lifestyle+2', alt: 'Family playing in a park', title: 'Joyful Connections' },
+                { src: 'https://placehold.co/900x700/E6A3FA/401C4D?text=Lifestyle+3', alt: 'Person working on a laptop in a cozy setting', title: 'Creative Flow' },
+                { src: 'https://placehold.co/1100x800/FAA3B8/4D1C28?text=Lifestyle+4', alt: 'Couple enjoying a scenic view', title: 'Adventure Together' },
+                { src: 'https://placehold.co/750x950/A3E6FA/1C3F4D?text=Lifestyle+5', alt: 'Artist painting in a studio', title: 'Passion Project' }
+            ]
+        };
+
+        const portfolioCategories = {
+            portraits: { title: "Portraits", description: "Capturing the unique essence and personality of individuals through compelling portraiture." },
+            nature: { title: "Nature", description: "Exploring the breathtaking beauty and diverse landscapes of the natural world." },
+            street: { title: "Street", description: "Documenting the candid moments, vibrant energy, and untold stories of urban life." },
+            lifestyle: { title: "Lifestyle", description: "Showcasing authentic moments, activities, and an overall way of life." }
+        };
+
+        // --- DOM Elements ---
+        const mainContent = document.getElementById('main-content');
+        const pageTemplates = document.getElementById('page-templates');
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImage = document.getElementById('lightbox-image');
+        const lightboxCaption = document.getElementById('lightbox-caption');
+        const lightboxClose = document.getElementById('lightbox-close');
+        const lightboxPrev = document.getElementById('lightbox-prev');
+        const lightboxNext = document.getElementById('lightbox-next');
+        const currentYearSpan = document.getElementById('current-year');
+
+        // --- State Variables ---
+        let currentLightboxCategory = '';
+        let currentLightboxIndex = 0;
+        let homePageImageInterval;
+
+        // --- Functions ---
+
+        // Theme Management
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+
+        function detectPreferredColorScheme() {
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            applyTheme(prefersDark ? 'dark' : 'light');
+            // Listen for changes
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+                applyTheme(event.matches ? 'dark' : 'light');
+            });
+        }
+
+        // Router/Navigation
+        function updateActiveNavLink(hash) {
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                // Handle portfolio dropdown parent
+                if (link.getAttribute('href') === hash || (hash.startsWith('#portfolio-') && link.textContent === 'Portfolio')) {
+                    link.classList.add('active');
+                } else if (link.getAttribute('href') === hash) {
+                     link.classList.add('active');
+                }
+            });
+             // Close mobile menu on navigation
+            if (mobileMenu.classList.contains('!transform-none')) {
+                mobileMenu.classList.remove('!transform-none');
+                mobileMenu.classList.add('-translate-x-full');
+                mobileMenuButton.setAttribute('aria-expanded', 'false');
+            }
+        }
+        
+        async function navigateTo(pageId) {
+            if (!mainContent) return;
+            mainContent.classList.add('loading'); // Start fade-out/blur
+
+            // Clear previous homepage image interval if navigating away from home
+            if (homePageImageInterval && pageId !== 'home') {
+                clearInterval(homePageImageInterval);
+                homePageImageInterval = null;
+            }
+
+            // Wait for transition
+            await new Promise(resolve => setTimeout(resolve, 250)); // Half of transition duration
+
+            mainContent.innerHTML = ''; // Clear current content
+            let pageElement;
+
+            if (pageId.startsWith('portfolio-')) {
+                const category = pageId.split('-')[1];
+                pageElement = loadPortfolioCategoryPage(category);
+            } else {
+                const template = pageTemplates.querySelector(`#${pageId}-page`);
+                if (template) {
+                    pageElement = template.cloneNode(true);
+                    pageElement.removeAttribute('id'); // Avoid duplicate IDs
+                }
+            }
+
+            if (pageElement) {
+                mainContent.appendChild(pageElement);
+                if (pageId === 'home') {
+                    renderHomepageImages();
+                    // Set interval for homepage image refresh (2 minutes)
+                    if (!homePageImageInterval) {
+                       homePageImageInterval = setInterval(renderHomepageImages, 2 * 60 * 1000);
+                    }
+                }
+                initializePageSpecificScripts(pageElement); // For event listeners on new content
+                observeScrollAnimations(pageElement); // Re-apply scroll animations
+            } else {
+                mainContent.innerHTML = '<p class="text-center py-10">Page not found.</p>';
+                console.error(`Page template for "${pageId}" not found.`);
+            }
+            
+            window.scrollTo(0,0); // Scroll to top of new page
+            mainContent.classList.remove('loading'); // Start fade-in/unblur
+            updateActiveNavLink('#' + pageId);
+        }
+
+        function handleHashChange() {
+            const hash = window.location.hash || '#home';
+            navigateTo(hash.substring(1));
+        }
+
+        // Homepage Image Display
+        function getRandomPhotos(countPerCategory = 2) {
+            const selectedPhotos = [];
+            Object.keys(allPhotos).forEach(category => {
+                const categoryPhotos = [...allPhotos[category]]; // Clone to avoid modifying original
+                for (let i = 0; i < countPerCategory; i++) {
+                    if (categoryPhotos.length === 0) break;
+                    const randomIndex = Math.floor(Math.random() * categoryPhotos.length);
+                    selectedPhotos.push(categoryPhotos.splice(randomIndex, 1)[0]);
+                }
+            });
+            return selectedPhotos.sort(() => 0.5 - Math.random()); // Shuffle all selected photos
+        }
+
+        function renderHomepageImages() {
+            const displayArea = document.getElementById('hero-image-display');
+            if (!displayArea) return;
+
+            displayArea.innerHTML = ''; // Clear previous images
+            const photosToDisplay = getRandomPhotos(2);
+
+            photosToDisplay.forEach(photo => {
+                const img = document.createElement('img');
+                img.src = photo.src;
+                img.alt = photo.alt;
+                img.title = photo.title;
+                img.loading = 'lazy'; // Basic lazy loading
+                img.classList.add('animate-on-scroll'); // For scroll animation
+                // Add onerror fallback
+                img.onerror = function() { this.src = 'https://placehold.co/400x300/ccc/999?text=Image+Error'; this.alt = 'Error loading image'; };
+                displayArea.appendChild(img);
+            });
+            observeScrollAnimations(displayArea); // Observe newly added images
+        }
+
+        // Portfolio Category Page
+        function loadPortfolioCategoryPage(categoryKey) {
+            const template = pageTemplates.querySelector('#portfolio-category-page');
+            if (!template || !portfolioCategories[categoryKey] || !allPhotos[categoryKey]) {
+                console.error(`Category ${categoryKey} not found.`);
+                const errorEl = document.createElement('p');
+                errorEl.textContent = 'Category not found.';
+                errorEl.className = 'text-center py-10';
+                return errorEl;
+            }
+
+            const pageElement = template.cloneNode(true);
+            pageElement.removeAttribute('id');
+
+            pageElement.querySelector('#portfolio-category-title').textContent = portfolioCategories[categoryKey].title;
+            pageElement.querySelector('#portfolio-category-description').textContent = portfolioCategories[categoryKey].description;
+
+            const grid = pageElement.querySelector('#portfolio-grid');
+            grid.innerHTML = ''; // Clear any template content
+
+            allPhotos[categoryKey].forEach((photo, index) => {
+                const item = document.createElement('div');
+                item.className = 'masonry-item animate-on-scroll';
+                const img = document.createElement('img');
+                img.src = photo.src;
+                img.alt = photo.alt;
+                img.title = photo.title;
+                img.loading = 'lazy';
+                img.dataset.category = categoryKey;
+                img.dataset.index = index;
+                img.onerror = function() { this.src = 'https://placehold.co/400x300/ccc/999?text=Image+Error'; this.alt = 'Error loading image'; };
+                img.addEventListener('click', () => openLightbox(categoryKey, index));
+                item.appendChild(img);
+                grid.appendChild(item);
+            });
+            return pageElement;
+        }
+
+        // Lightbox Functionality
+        function openLightbox(category, index) {
+            currentLightboxCategory = category;
+            currentLightboxIndex = index;
+            updateLightboxImage();
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function updateLightboxImage() {
+            const photo = allPhotos[currentLightboxCategory][currentLightboxIndex];
+            lightboxImage.src = photo.src;
+            lightboxImage.alt = photo.alt;
+            lightboxCaption.textContent = photo.title;
+        }
+
+        function showNextImage() {
+            currentLightboxIndex = (currentLightboxIndex + 1) % allPhotos[currentLightboxCategory].length;
+            updateLightboxImage();
+        }
+
+        function showPrevImage() {
+            currentLightboxIndex = (currentLightboxIndex - 1 + allPhotos[currentLightboxCategory].length) % allPhotos[currentLightboxCategory].length;
+            updateLightboxImage();
+        }
+        
+        // Contact Form
+        async function handleContactFormSubmit(event) {
+            event.preventDefault();
+            const form = event.target;
+            const submitButton = form.querySelector('#submit-contact-form');
+            const buttonText = submitButton.querySelector('.button-text');
+            const spinner = submitButton.querySelector('.spinner');
+            const feedbackDiv = document.getElementById('form-feedback');
+
+            feedbackDiv.textContent = '';
+            feedbackDiv.className = 'mt-4 text-center'; // Reset classes
+            buttonText.textContent = 'Sending...';
+            spinner.classList.remove('hidden');
+            submitButton.disabled = true;
+
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            // Client-side validation (basic)
+            if (!data.name || !data.email || !data.subject || !data.message) {
+                feedbackDiv.textContent = 'Please fill in all required fields.';
+                feedbackDiv.classList.add('text-red-500');
+                buttonText.textContent = 'Send Message';
+                spinner.classList.add('hidden');
+                submitButton.disabled = false;
+                return;
+            }
+            if (!/^\S+@\S+\.\S+$/.test(data.email)) {
+                feedbackDiv.textContent = 'Please enter a valid email address.';
+                feedbackDiv.classList.add('text-red-500');
+                buttonText.textContent = 'Send Message';
+                spinner.classList.add('hidden');
+                submitButton.disabled = false;
+                return;
+            }
+
+            // Simulate sending email using Gemini API
+            const prompt = `
+                Format the following contact form submission into a professional email.
+                The email should be addressed to ${photographerInfo.email}.
+                The subject line should be: "Website Contact Form: ${data.subject}"
+                The body of the email should clearly list all the information provided by the user.
+
+                User's Name: ${data.name}
+                User's Email: ${data.email}
+                User's Phone: ${data.phone || 'Not provided'}
+                Selected Subject: ${data.subject}
+                Message:
+                ${data.message}
+
+                Conclude the email draft by saying this is an automated message from the website contact form.
+            `;
+
+            try {
+                // This is where you would normally make a fetch call to your backend.
+                // For this demo, we'll use the Gemini API to "generate the email content".
+                // In a real scenario, your backend would take this data and use an email service (SendGrid, Mailgun, etc.)
+                
+                let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+                const payload = { contents: chatHistory };
+                const apiKey = ""; // Canvas will provide this if needed for non-default models
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorResult = await response.json();
+                    console.error('Gemini API Error:', errorResult);
+                    throw new Error(`API Error: ${errorResult.error?.message || response.statusText}`);
+                }
+
+                const result = await response.json();
+                
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const emailContent = result.candidates[0].content.parts[0].text;
+                    console.log("Simulated Email Content (would be sent by backend):\n", emailContent);
+                    
+                    feedbackDiv.textContent = 'Thank you for your message! Faris will get back to you soon.';
+                    feedbackDiv.classList.add('text-green-500');
+                    form.reset();
+                    // Optionally hide form: form.style.display = 'none';
+                } else {
+                    console.error('Unexpected Gemini API response structure:', result);
+                    throw new Error('Failed to process response from email simulation.');
+                }
+
+            } catch (error) {
+                console.error('Form submission error:', error);
+                feedbackDiv.textContent = 'Sorry, there was an error sending your message. Please try again later or contact Faris directly via email.';
+                feedbackDiv.classList.add('text-red-500');
+            } finally {
+                buttonText.textContent = 'Send Message';
+                spinner.classList.add('hidden');
+                submitButton.disabled = false;
+            }
+        }
+
+        // Scroll Animations
+        function observeScrollAnimations(container = document) {
+            const animatedElements = container.querySelectorAll('.animate-on-scroll');
+            if (!animatedElements.length) return;
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target); // Optional: stop observing once visible
+                    }
+                });
+            }, { threshold: 0.1 }); // Trigger when 10% of the element is visible
+
+            animatedElements.forEach(el => observer.observe(el));
+        }
+        
+        // Initialize scripts for dynamically loaded content
+        function initializePageSpecificScripts(pageElement) {
+            const contactForm = pageElement.querySelector('#contact-form');
+            if (contactForm) {
+                contactForm.addEventListener('submit', handleContactFormSubmit);
+            }
+            // Add other page-specific initializations here if needed
+        }
+
+
+        // --- Event Listeners & Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            detectPreferredColorScheme();
+            
+            currentYearSpan.textContent = new Date().getFullYear();
+
+            // Mobile Menu Toggle
+            mobileMenuButton.addEventListener('click', () => {
+                const expanded = mobileMenuButton.getAttribute('aria-expanded') === 'true' || false;
+                mobileMenuButton.setAttribute('aria-expanded', !expanded);
+                mobileMenu.classList.toggle('-translate-x-full');
+                mobileMenu.classList.toggle('!transform-none'); // Using ! to override Tailwind's default transform
+            });
+
+            // Close mobile menu when a link is clicked
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('-translate-x-full');
+                    mobileMenu.classList.remove('!transform-none');
+                    mobileMenuButton.setAttribute('aria-expanded', 'false');
+                });
+            });
+            
+            // Navigation handling
+            window.addEventListener('hashchange', handleHashChange);
+            handleHashChange(); // Initial page load based on hash or default to home
+
+            // Lightbox controls
+            lightboxClose.addEventListener('click', closeLightbox);
+            lightboxPrev.addEventListener('click', showPrevImage);
+            lightboxNext.addEventListener('click', showNextImage);
+            lightbox.addEventListener('click', (e) => { // Close if clicking on backdrop
+                if (e.target === lightbox) closeLightbox();
+            });
+            document.addEventListener('keydown', (e) => { // Keyboard nav for lightbox
+                if (lightbox.classList.contains('active')) {
+                    if (e.key === 'Escape') closeLightbox();
+                    if (e.key === 'ArrowLeft') showPrevImage();
+                    if (e.key === 'ArrowRight') showNextImage();
+                }
+            });
+
+            // Initial call for scroll animations on static elements (e.g. footer)
+            observeScrollAnimations();
+        });
+
+    </script>
+</body>
+</html>
